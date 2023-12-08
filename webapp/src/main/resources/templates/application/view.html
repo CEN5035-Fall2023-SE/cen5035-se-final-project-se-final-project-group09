@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container-fluid" style="width: 80vw;">
+        <div class="card my-5">
+            <div class="card-header">
+                <h2 class="text-center">Application Status</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-lg-auto">
+                        <span class="fs-5">Applicant Details,</span>
+                    </div>
+                    <div class="col-lg">
+                        <table class="table align-bottom table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Name:</td>
+                                    <td class="display-6" th:text="${app.applicant.name}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Gender & Age:</td>
+                                    <td class="fs-5"
+                                        th:text="${app.applicant.gender + ' (' + app.applicant.age + 'y)'}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">E-mail:</td>
+                                    <td class="small"><a class="text-reset fst-italic"
+                                            th:href="${'mailto:' + app.applicant.email}"
+                                            th:text="${app.applicant.email}"></a></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg align-self-center">
+                        <table class="table align-bottom table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Department:</td>
+                                    <td class="fs-5" th:text="${app.applicant.department.name}"></td>
+                                </tr>
+                                <tr th:if="${app.applicant.role.name() != 'APPLICANT'}">
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Role:</td>
+                                    <td class="fs-5" th:text="${app.applicant.role.description}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <hr>
+                <div class="row">
+                    <div class="col-lg-5">
+                        <table class="table align-middle table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">ID:</td>
+                                    <td class="fs-5" th:text="${app.id}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Status:</td>
+                                    <td class="fs-5"
+                                        th:text="${((app.status.name() == 'ARCHIVED')? (app.isAccepted)? 'Accepted & ' : 'Rejected & ' : '') + app.status.description}">
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg">
+                        <table class="table align-middle table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Date:</td>
+                                    <td class="fs-5"
+                                        th:text="${#temporals.format(app.submittedDate, 'dd-MMM-yyyy HH:mm a')}"></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <div class="d-lg-flex justify-content-lg-center">
+                                            <div>
+                                                <a class="btn btn-info" type="button" target="_blank"
+                                                    th:href="@{/application/view/{id}/cv(id=${app.id})}">Check CV</a>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="col-lg-2 align-self-center">
+                        <a class="btn btn-secondary" type="button" target="_blank"
+                            th:href="@{/application/view/{id}/cv(id=${app.id})}">Check CV</a>
+                    </div> -->
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <div class="row">
+                    <div class="col-lg-5">
+                        <table class="table align-middle table-borderless mb-0">
+                            <tbody>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Brief:</td>
+                                    <td class="fs-5" th:text="${app.description}"></td>
+                                </tr>
+                                <tr>
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Course(s) Selected:
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap">
+                                            <th:block th:each="crs : ${app.coursesSelected}">
+                                                <p class="m-1 p-1 border rounded" th:text="${crs.name}"></p>
+                                            </th:block>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${app.isCoursesRecommended}">
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Course(s)
+                                        Recommended:</td>
+                                    <td>
+                                        <div class="d-flex flex-wrap">
+                                            <th:block th:each="crs : ${app.coursesSelected}">
+                                                <p class="m-1 p-1 border rounded" th:text="${crs.name}"></p>
+                                            </th:block>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr th:if="${app.isCourseAlloted}">
+                                    <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Course Approved:
+                                    </td>
+                                    <td>
+                                        <div class="d-flex flex-wrap">
+                                            <p class="m-1 p-1 border rounded" th:text="${app.courseAlloted.name}"></p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg align-self-center">
+                        <p class="fst-italic" th:if="${!app.isExperainced}">No Previous Experiances!</p>
+                        <span class="fw-bold" th:if="${app.isExperainced}">Previous Experiances :</span>
+                        <div class="row" th:if="${app.isExperainced}">
+                            <div class="col-lg mx-lg-2 border rounded" th:each="prevexp, itr : ${app.prevExperiances}">
+                                <table class="table align-middle table-borderless mb-0">
+                                    <tbody>
+                                        <tr>
+                                            <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Period:
+                                            </td>
+                                            <td class="fs-6" th:text="${#temporals.format(prevexp.startDate, 'MMM dd, yyyy')
+                                                    + '&nbsp;&nbsp;–&nbsp;&nbsp;'
+                                                    + #temporals.format(prevexp.endDate, 'MMM dd, yyyy')}">
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Brief:
+                                            </td>
+                                            <td class="fs-5" th:text="${prevexp.description}">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <th:block th:if="${#lists.contains({'ACCEPTED', 'ARCHIVED'}, app.status.name())}">
+                            <div class="py-2"></div>
+                            <p class="fst-italic" th:if="${app.isAccepted && #lists.isEmpty(app.feedbacks)}">No
+                                Feedbacks!</p>
+                            <span class="fw-bold" th:if="${app.isAccepted && !#lists.isEmpty(app.feedbacks)}">Feedbacks:</span>
+                            <th:block th:if="${app.isAccepted}" th:each="fb, itr : ${app.feedbacks}">
+                                <p class="px-2 py-1 mb-2 border rounded" th:text="${fb}"></p>
+                            </th:block>
+                        </th:block>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <!-- ADD COURSE RECOMMENDATIONS SECTION -->
+                <div class="container" th:if="${app.status.name() == 'SUBMITTED' 
+                        && (#authentication.principal.userDto.role.name() == 'ADMIN'
+                            || (#authentication.principal.userDto.role.name() == 'DEPARTMENT_STAFF'
+                                && app.applicant.department.id == #authentication.principal.userDto.department.id))}">
+                    <hr>
+                    <form method="post" id="courses-recommended-update-form" role="form"
+                        th:action="@{/application/view/{id}/coursesRecommended(id=${app.id})}"
+                        th:object="${updateCoursesRecommended}">
+                        <input type="hidden" name="applicationId" th:value="${app.id}">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Select Recommended Courses</label><br>
+                            <div class="btn-toolbar justify-content-lg-center" role="toolbar">
+                                <div class="btn-group m-1" role="group" th:each="crs,itr : ${app.coursesSelected}"
+                                    th:if="${crs.active}">
+                                    <input type="checkbox" class="btn-check" th:id="${itr.count}" name="courseIds"
+                                        th:value="${crs.id}" autocomplete="off">
+                                    <label class="btn btn-outline-secondary" th:for="${itr.count}"
+                                        th:text="${crs.name}"></label>
+                                </div>
+                            </div>
+                            <p th:errors="*{courseIds}" class="text-danger" th:if="${#fields.hasErrors('courseIds')}">
+                            </p>
+                        </div>
+                        <div class="row justify-content-center">
+                            <button class="col-lg-1 btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <!-- ALLOT COURSE SECTION -->
+                <div class="container" th:if="${app.status.name() == 'STAFF_RECOMMENDED' 
+                        && (#authentication.principal.userDto.role.name() == 'ADMIN'
+                            || (#authentication.principal.userDto.role.name() == 'COMMITTEE_MEMBER'
+                                && app.applicant.department.id == #authentication.principal.userDto.department.id))}">
+                    <hr>
+                    <form method="post" id="courses-recommended-allot-form" role="form"
+                        th:action="@{/application/view/{id}/courseAllot(id=${app.id})}"
+                        th:object="${updateCourseAlloted}">
+                        <input type="hidden" name="applicationId" th:value="${app.id}">
+                        <div class="form-group mb-3">
+                            <label class="form-label">Allot Course</label><br>
+                            <div class="btn-toolbar justify-content-lg-center" role="toolbar">
+                                <div class="btn-group m-1" role="group" th:each="crs,itr : ${app.coursesRecommended}"
+                                    th:if="${crs.active}">
+                                    <input type="radio" class="btn-check" th:id="${itr.count}" name="courseId"
+                                        th:value="${crs.id}" autocomplete="off">
+                                    <label class="btn btn-outline-secondary" th:for="${itr.count}"
+                                        th:text="${crs.name}"></label>
+                                </div>
+                            </div>
+                            <p th:errors="*{courseId}" class="text-danger" th:if="${#fields.hasErrors('courseId')}">
+                            </p>
+                        </div>
+                        <div class="row justify-content-center">
+                            <button class="col-lg-1 btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <!-- ACCEPTANCE SECTION -->
+                <div class="container" th:if="${app.status.name() == 'COURSE_ALLOTED' 
+                        && (#authentication.principal.userDto.role.name() == 'ADMIN'
+                            || (#authentication.principal.userDto.role.name() == 'APPLICANT'
+                                && app.applicant.id == #authentication.principal.userDto.id))}">
+                    <hr>
+                    <div class="row">
+                        <div class="col-lg-6 d-flex justify-content-lg-end">
+                            <form method="post" role="form"
+                                th:action="@{/application/view/{id}/{acceptance}(id=${app.id}, acceptance=${true})}">
+                                <button type="submit" class="btn btn-success">Accept</button>
+                            </form>
+                        </div>
+                        <div class="col-lg-6 d-flex justify-content-lg-start">
+                            <form method="post" role="form"
+                                th:action="@{/application/view/{id}/{acceptance}(id=${app.id}, acceptance=${false})}">
+                                <button type="submit" class="btn btn-danger">Decline</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <!-- FEEDBACK SECTION -->
+                <div class="container" th:if="${app.status.name() == 'ACCEPTED' 
+                        && (#authentication.principal.userDto.role.name() == 'ADMIN'
+                            || (#authentication.principal.userDto.role.name() == 'INSTRUCTOR'
+                                    && app.courseAlloted.instructor.id == #authentication.principal.userDto.id))}">
+                    <hr>
+                    <form method="post" role="form" th:action="@{/application/view/{id}/addFeedback(id=${app.id})}">
+                        <div class="row col-lg-8 offset-lg-2">
+                            <div class="form-group mb-3">
+                                <textarea class="form-control" rows="2" maxlength="255" name="feedback"
+                                    placeholder="Add Feedback..."></textarea>
+                            </div>
+                        </div>
+                        <div class="row justify-content-center">
+                            <button class="col-lg-1 btn btn-primary" type="submit">Submit</button>
+                        </div>
+                    </form>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+                <!-- ARCHIVE SECTION -->
+                <div class="container" th:if="${#lists.contains({'ACCEPTED', 'REJECTED'}, app.status.name()) 
+                        && (#authentication.principal.userDto.role.name() == 'ADMIN'
+                            || (#authentication.principal.userDto.role.name() == 'DEPARTMENT_STAFF'
+                                && app.applicant.department.id == #authentication.principal.userDto.department.id))}">
+                    <hr>
+                    <form method="post" role="form" th:action="@{/application/view/{id}/archive(id=${app.id})}">
+                        <button type="submit" class="btn btn-secondary">Archive Application</button>
+                    </form>
+                </div>
+                <!--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------->
+            </div>
+        </div>
+    </div>
+
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

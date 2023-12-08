@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-6 offset-md-3">
+                <div th:if="${param.regsuccess}">
+                    <div class="alert alert-info">You've successfully registered to our Application!</div>
+                </div>
+                <div th:if="${param.error}">
+                    <div class="alert alert-danger">Invalid Email and Password!</div>
+                </div>
+                <div th:if="${param.logout}">
+                    <div class="alert alert-success">You have been logged out!</div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-lg-evenly my-5" style="height: 60vh;">
+            <div class="col-lg-6 align-self-lg-center text-center text-light bg-primary rounded">
+                <p class="display-3 fw-bold pt-4 pb-1">NORTHERN UNIVERSITY</p>
+                <p class="fs-4 pt-1 pb-4">Teaching Assistants Management Portal</p>
+            </div>
+            <div class="col-lg-4 align-self-lg-center">
+                <div class="card">
+                    <div class="card-header">
+                        <h2 class="text-center">Login</h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" th:action="@{/auth/login}" class="form-horizontal" role="form">
+                            <div class="form-group mb-3">
+                                <label for="username" class="form-label">Email</label>
+                                <input type="text" id="username" name="username" class="form-control"
+                                    placeholder="Email" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" id="password" name="password" class="form-control"
+                                    placeholder="Password" />
+                            </div>
+                            <div class="form-group mb-3">
+                                <button type="submit" class="btn btn-primary">Login</button>
+                                <span>Not registered?
+                                    <a th:href="@{/auth/register}">Register here</a>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

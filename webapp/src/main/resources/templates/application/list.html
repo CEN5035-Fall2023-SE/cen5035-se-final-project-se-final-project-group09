@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container-fluid">
+        <div class="card my-5">
+            <div class="card-header">
+                <h2 class="text-center">List Applications</h2>
+            </div>
+            <div class="card-body">
+                <div class="row" th:if="${#lists.isEmpty(applications)}">
+                    <div class="col-md-12 text-center fst-italic">No Applications to view!</div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover" th:if="${!#lists.isEmpty(applications)}">
+                        <thead>
+                            <th>#</th>
+                            <th>Applicant</th>
+                            <th>Department</th>
+                            <th>Courses Selected</th>
+                            <th>Course Alloted</th>
+                            <th>Status</th>
+                            <th>Submition Date</th>
+                            <th></th>
+                        </thead>
+                        <tbody>
+                            <tr class="align-middle" th:each="app, itr : ${applications}">
+                                <td th:text="${itr.index + 1}"></td>
+                                <td>
+                                    <div th:text="${app.applicant.name}"></div>
+                                </td>
+                                <td th:text="${app.applicant.department.name}"></td>
+                                <td>
+                                    <div class="d-flex flex-wrap">
+                                        <th:block th:each="crs : ${app.coursesSelected}">
+                                            <p class="m-1 p-1 border rounded" th:text="${crs.name}"></p>
+                                        </th:block>
+                                    </div>
+                                </td>
+                                <td>
+                                    <p class="m-1 p-1 border rounded" th:if="${app.courseAlloted.id != null}" th:text="${app.courseAlloted.name}"></p>
+                                </td>
+                                <td th:text="${app.status.description}"></td>
+                                <td th:text="${#temporals.format(app.submittedDate, 'dd-MMM-yyyy HH:mm a')}"></td>
+                                <td>
+                                    <a class="btn btn-info" th:href="@{/application/view/{id}(id=${app.id})}">View</a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementsByName("coursesSelectedCells").forEach(
+            (td) => {
+                td.innerHTML = td.innerHTML.substring(0, td.innerHTML.length - 2)
+            }
+        )
+    </script>
+
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

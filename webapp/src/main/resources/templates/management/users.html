@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container">
+        <div class="card my-5">
+            <div class="card-header">
+                <h2 class="text-center">Registered Users</h2>
+            </div>
+            <div class="card-body">
+                <table class="table table-striped table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Gender</th>
+                            <th>Role</th>
+                            <th>Department</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="user, itr: ${users}">
+                            <td th:text="${itr.count}"></td>
+                            <td th:text="${user.name}"></td>
+                            <td th:text="${user.email}"></td>
+                            <td th:text="${user.gender + ' (' + user.age + 'y)'}"></td>
+                            <td th:text="${user.role.description}"></td>
+                            <td th:text="${user.department.name}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

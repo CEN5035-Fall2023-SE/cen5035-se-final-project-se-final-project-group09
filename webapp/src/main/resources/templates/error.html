@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container-fluid">
+        <div class="card my-5">
+            <div class="card-header">
+                <h1 class="text-center">Error Page</h1>
+            </div>
+            <div class="card-body">
+            <table class="table ">
+                <tr>
+                    <th scope="row">User Details</th>
+                    <td sec:authorize="!isAuthenticated()">Not Authenticated!</td>
+                    <td sec:authorize="isAuthenticated()">
+                        <table class="table table-borderless w-auto">
+                            <tr>
+                                <th scope="row">Name</th>
+                                <td th:text="${#authentication.principal.userDto.name}"></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Email</th>
+                                <td><a class="text-reset" th:href="${'mailto:' + #authentication.principal.userDto.email}" th:text="${#authentication.principal.userDto.email}"></a></td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Role</th>
+                                <td th:text="${#authentication.principal.userDto.role.description}"></td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+                <tr>
+                    <th scope="row">Date</th>
+                    <td th:text="${timestamp}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Path</td>
+                    <td th:text="${path}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Error</td>
+                    <td th:text="${error}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Status</td>
+                    <td th:text="${status}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Message</td>
+                    <td th:text="${message}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Exception</td>
+                    <td th:text="${exception}"></td>
+                </tr>
+                <tr>
+                    <th scope="row">Trace</td>
+                    <td>
+                        <pre th:text="${trace}"></pre>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

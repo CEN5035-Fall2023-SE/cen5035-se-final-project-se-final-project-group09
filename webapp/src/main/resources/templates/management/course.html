@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md">
+                <div class="card my-5">
+                    <div class="card-header">
+                        <h2 class="text-center">Department - Course Management</h2>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-borderless align-middle">
+                            <tbody>
+                                <th:block th:each="dept : ${departments}" th:if="${#authentication.principal.userDto.role.name() == 'ADMIN' || #authentication.principal.userDto.department.id == dept.id}">
+                                    <tr>
+                                        <td class="fw-bold fs-6" style="width: 1%; white-space: nowrap;">Department Name:</td>
+                                        <td class="fs-5" th:text="${dept.name}"></td>
+                                    </tr>
+                                    <tr>
+                                        <td colspan="2">
+                                            <table class="table table-sm align-middle">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Course Name</th>
+                                                        <th>Instructor Name</th>
+                                                        <th style="width: 1%; white-space: nowrap;">Accpeting Applications</th>
+                                                        <th colspan="2"></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <th:block th:each="crs : ${courses}" th:if="${crs.department.id == dept.id}">
+                                                        <tr th:id="'div-' + ${crs.id}">
+                                                            <td th:text="${crs.name}"></td>
+                                                            <td th:text="${crs.instructor.name}"></td>
+                                                            <td class="text-center" th:text="${crs.active? 'Yes' : 'No'}"></td>
+                                                            <td></td>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-secondary" th:onclick="'editCourse(' + ${crs.id} + ')'">Edit</button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr th:id="'form-' + ${crs.id}" hidden>
+                                                            <form method="post" role="form" th:action="@{/editCourse}">
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <input type="number" hidden class="form-control" th:name="id" th:value="${crs.id}">
+                                                                        <input type="number" hidden class="form-control" th:name="department.id" th:value="${crs.department.id}">
+                                                                        <input type="text" class="form-control" th:name="name" th:value="${crs.name}">
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-group">
+                                                                        <select class="form-select" name="instructor.id" id="instructor.id">
+                                                                            <option th:value="${null}" selected>None</option>
+                                                                            <option th:each="inst : ${instructors}" th:if="${dept.id == inst.department.id}" th:value="${inst.id}" th:text="${inst.name}" th:selected="${crs.instructor.id == inst.id}"></option>
+                                                                        </select>
+                                                                    </div>
+                                                                </td>
+                                                                <td>
+                                                                    <div class="form-check">
+                                                                        <input type="checkbox" class="form-check-input" name="active" th:checked="${crs.active}">
+                                                                        <input type="hidden" name="_active" value="on" />Accepting</input>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="text-center">
+                                                                    <div class="form-group">
+                                                                        <button class="btn btn-secondary" type="submit" th:id="'btnsave-' + ${crs.id}" disabled>Save</button>
+                                                                    </div>
+                                                                </td>
+                                                            </form>
+                                                            <td class="text-center">
+                                                                <button class="btn btn-secondary" th:onclick="'editCourse(' + ${crs.id} + ')'">Cancel</button>
+                                                            </td>
+                                                        </tr>
+                                                    </th:block>
+                                                    <tr th:if="${#lists.contains({'ADMIN', 'DEPARTMENT_STAFF', 'COMMITTEE_MEMBER'}, #authentication.principal.userDto.role.name())}">
+                                                        <form method="post" role="form" th:action="@{/addCourse}" th:object="${newCourse}">
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <input type="number" hidden class="form-control" th:name="department.id" th:value="${dept.id}">
+                                                                    <input class="form-control" placeholder="Enter Course Name" th:field="*{name}" type="text" required />
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-group">
+                                                                    <select class="form-select" name="instructor.id" id="instructor.id">
+                                                                        <option selected hidden disabled>Select Instructor</option>
+                                                                        <option th:each="inst : ${instructors}" th:if="${dept.id == inst.department.id}" th:value="${inst.id}" th:text="${inst.name}"></option>
+                                                                    </select>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input" th:field="*{active}" th:text="'Accepting'">
+                                                                </div>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <div class="form-group">
+                                                                    <button class="btn btn-secondary" type="submit">+ New Course</button>
+                                                                </div>
+                                                            </td>
+                                                            <td></td>
+                                                        </form>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                </th:block>
+                                <tr th:if="${#authentication.principal.userDto.role.name() == 'ADMIN'}">
+                                    <td colspan="2">
+                                        <form method="post" role="form" th:action="@{/addDepartment}" th:object="${newDepartment}">
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <input class="form-control" placeholder="Enter Department Name" th:field="*{name}" type="text" required />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-group">
+                                                        <button class="btn btn-secondary" type="submit">+ New Department</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <!-- <ul class="list-group">
+                            <li class="list-group-item" th:each="dept : ${departments}">
+                                <span class="font-monospace fs-5" th:text="${dept.name}"></span>
+                                <ul class="list-group">
+                                    <th:block th:each="crs : ${courses}" th:if="${dept.id == crs.department.id}">
+                                        <li class="list-group-item">
+                                            <div class="row">
+                                                <div class="col-md">
+                                                    <div class="row align-items-center" th:id="'div-' + ${crs.id}">
+                                                        <span class="col-md-4 fs-5 text-center"
+                                                            th:text="${crs.name}"></span>
+                                                        <span class="col-md fs-6 fw-light fst-italic"
+                                                            th:text="'by ' + ${crs.instructor.name}"></span>
+                                                        <span class="col-md-3"
+                                                            th:text="${crs.active? 'Require':'Inactive'}"></span>
+                                                    </div>
+                                                    <form th:id="'form-' + ${crs.id}" method="post" role="form"
+                                                        th:action="@{/editCourse}" hidden>
+                                                        <div class="row align-items-center">
+                                                            <div class="col-md-4">
+                                                                <div class="form-group">
+                                                                    <input type="number" hidden class="form-control"
+                                                                        th:name="id" th:value="${crs.id}">
+                                                                    <input type="number" hidden class="form-control"
+                                                                        th:name="department.id"
+                                                                        th:value="${crs.department.id}">
+                                                                    <input type="text" class="form-control"
+                                                                        th:name="name" th:value="${crs.name}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-5">
+                                                                <div class="form-group">
+                                                                    <select class="form-select" name="instructor.id"
+                                                                        id="instructor.id">
+                                                                        <option th:value="${null}" selected>None
+                                                                        </option>
+                                                                        <option th:each="inst : ${instructors}"
+                                                                            th:if="${dept.id == inst.department.id}"
+                                                                            th:value="${inst.id}" th:text="${inst.name}"
+                                                                            th:selected="${crs.instructor.id == inst.id}">
+                                                                        </option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-2">
+                                                                <div class="form-check">
+                                                                    <input type="checkbox" class="form-check-input"
+                                                                        name="active" th:checked="${crs.active}">
+                                                                    <input type="hidden" name="_active"
+                                                                        value="on" />Accepting</input>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-1">
+                                                                <div class="form-group">
+                                                                    <button class="btn btn-secondary" type="submit"
+                                                                        th:id="'btnsave-' + ${crs.id}"
+                                                                        disabled>Save</button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-md-auto d-flex justify-content-center">
+                                                    <button class="btn btn-secondary" th:id="'btnedit-' + ${crs.id}"
+                                                        th:onclick="'editCourse(' + ${crs.id} + ')'">Edit</button>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </th:block>
+                                    <li class="list-group-item">
+                                        <form method="post" role="form" th:action="@{/addCourse}"
+                                            th:object="${newCourse}">
+                                            <div class="row">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <input type="number" hidden class="form-control"
+                                                            th:name="department.id" th:value="${dept.id}">
+                                                        <input class="form-control" placeholder="Enter Course Name"
+                                                            th:field="*{name}" type="text" required />
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <select class="form-select" name="instructor.id"
+                                                            id="instructor.id">
+                                                            <option selected hidden disabled>Select Instructor</option>
+                                                            <option th:each="inst : ${instructors}"
+                                                                th:if="${dept.id == inst.department.id}"
+                                                                th:value="${inst.id}" th:text="${inst.name}"></option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-check">
+                                                        <input type="checkbox" class="form-check-input"
+                                                            th:field="*{active}" th:text="'Accepting'">
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-2">
+                                                    <div class="form-group">
+                                                        <button class="btn btn-secondary" type="submit">
+                                                            + New Course</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                            <li class="list-group-item">
+                                <form method="post" role="form" th:action="@{/addDepartment}"
+                                    th:object="${newDepartment}">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <input class="form-control" placeholder="Enter Department Name"
+                                                    th:field="*{name}" type="text" required />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <button class="btn btn-secondary" type="submit">+ New
+                                                    Department</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </li>
+                        </ul> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function editCourse(id) {
+            document.getElementById('form-' + id).hidden ^= true;
+            document.getElementById('div-' + id).hidden ^= true;
+            document.getElementById('btnsave-' + id).disabled ^= true;
+            // document.getElementById('btnedit-' + id).textContent = document.getElementById('form-' + id).hidden ? 'Edit' : 'Cancel';
+        }
+    </script>
+
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>

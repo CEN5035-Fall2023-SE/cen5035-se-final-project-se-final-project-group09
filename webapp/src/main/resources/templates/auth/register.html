@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+
+<head th:replace="~{fragments/layout::head}"></head>
+
+<nav th:replace="~{fragments/layout::navigation}"></nav>
+
+<body>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <div class="card mt-5">
+                    <div class="card-header">
+                        <h2 class="text-center" th:text="${internal? 'Internal' : 'Applicant'} + ' Registration'"></h2>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" role="form" th:action="@{/auth/register} + ${internal? '?internal' : ''}"
+                            th:object="${user}">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">First Name</label>
+                                        <input class="form-control" placeholder="Enter first name"
+                                            th:field="*{firstName}" type="text" />
+                                        <p th:errors="*{firstName}" class="text-danger"
+                                            th:if="${#fields.hasErrors('firstName')}">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Last Name</label>
+                                        <input class="form-control" placeholder="Enter first name"
+                                            th:field="*{lastName}" type="text" />
+                                        <p th:errors="*{lastName}" class="text-danger"
+                                            th:if="${#fields.hasErrors('lastName')}">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Email</label>
+                                <input class="form-control" placeholder="Enter email address" th:field="*{email}"
+                                    type="text" />
+                                <p th:errors="*{email}" class="text-danger" th:if="${#fields.hasErrors('email')}">
+                                </p>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Password</label>
+                                <input class="form-control" placeholder="Enter password" th:field="*{password}"
+                                    type="password" />
+                                <p th:errors="*{password}" class="text-danger" th:if="${#fields.hasErrors('password')}">
+                                </p>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-5">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Date of Birth</label>
+                                        <input class="form-control" type="date" th:field="*{dob}">
+                                        <p th:errors="*{dob}" class="text-danger" th:if="${#fields.hasErrors('dob')}">
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="col-md-7">
+                                    <div class="form-group mb-3">
+                                        <label class="form-label">Gender</label><br>
+                                        <th:block
+                                            th:each="genderType: ${T(com.taproject.webapp.model.GenderEnum).values()}">
+                                            <input class="btn-check" type="radio" th:value="${genderType.name()}"
+                                                th:field="*{gender}">
+                                            <label class="btn btn-outline-secondary" th:for="${#ids.prev('gender')}"
+                                                th:text="${genderType.name()}"></label>
+                                        </th:block>
+                                        <p th:errors="*{gender}" class="text-danger"
+                                            th:if="${#fields.hasErrors('gender')}">
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group mb-3" th:hidden="${!internal}">
+                                <label class="form-label">Role</label><br>
+                                <th:block th:each="roleType: ${T(com.taproject.webapp.model.RoleEnum).listRoles()}">
+                                    <input class="btn-check" type="radio" th:value="${roleType.name()}"
+                                        th:field="*{role}" autocomplete="off"
+                                        th:hidden="${roleType.name().equals('APPLICANT')}">
+                                    <label class="btn btn-outline-secondary" th:for="${#ids.prev('role')}"
+                                        th:text="${roleType.description}"
+                                        th:hidden="${roleType.name().equals('APPLICANT')}"></label>
+                                </th:block>
+                                <p th:errors="*{role}" class="text-danger" th:if="${#fields.hasErrors('role')}">
+                                </p>
+                            </div>
+                            <div class="form-group mb-3">
+                                <label class="form-label">Department</label><br>
+                                <select class="form-select" aria-label="Default select example" name="department.id"
+                                    id="department.id">
+                                    <option selected hidden disabled>Select Department</option>
+                                    <option th:each="dept : ${depts}" th:value="${dept.id}" th:text="${dept.name}"
+                                        th:selected="${dept.id == user.department.id}"></option>
+                                </select>
+                                <p th:errors="*{department}" class="text-danger"
+                                    th:if="${#fields.hasErrors('department')}">
+                                </p>
+                            </div>
+                            <div class="form-group mb-3">
+                                <button class="btn btn-primary" type="submit">Register</button>
+                                <span>Already registered? <a th:href="@{/auth/login}">Login here</a></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div th:replace="~{fragments/layout::bootstrap-script}"></div>
+</body>
+
+</html>
